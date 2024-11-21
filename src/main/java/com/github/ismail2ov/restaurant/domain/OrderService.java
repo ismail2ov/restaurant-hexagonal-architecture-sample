@@ -1,6 +1,7 @@
 package com.github.ismail2ov.restaurant.domain;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderService {
 
@@ -12,5 +13,7 @@ public interface OrderService {
 
     List<Order> getAllOrders();
 
-    Order findOrderById(Long id);
+    Optional<Order> findOrderById(Long id);
+
+    Order updateOrderStatus(Order order, OrderStatus orderStatus);
 }
