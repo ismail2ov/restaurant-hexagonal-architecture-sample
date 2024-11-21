@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class PosPayment implements PaymentService {
 
     @Override
-    public void processPayment(Long orderId, PaymentDetails paymentDetails) {
-
+    public boolean processPayment(Long orderId, PaymentDetails paymentDetails) {
+        return false;
     }
 }

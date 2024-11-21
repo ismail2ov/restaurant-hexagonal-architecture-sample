@@ -26,6 +26,7 @@ public class WebOrder implements OrderController {
     CashPayment cashPayment;
     OrderMapper mapper;
 
+    @Override
     @PostMapping("/orders")
     public ResponseEntity<Order> placeOrder(@RequestBody OrderRequest orderRequest) {
         Order newOrder = mapper.map(orderRequest);
@@ -34,6 +35,7 @@ public class WebOrder implements OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 
+    @Override
     @PutMapping("/orders/{orderId}/status")
     public ResponseEntity<Void> updateOrderStatus(@PathVariable Long orderId, @RequestParam OrderStatus status) {
         orderUseCase.updateOrderStatus(orderId, status);

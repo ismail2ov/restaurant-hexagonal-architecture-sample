@@ -9,6 +9,21 @@ import org.springframework.stereotype.Service;
 public class MenuServiceImpl implements MenuService {
 
     @Override
+    public boolean addMenuItem(MenuItem menuItem) {
+        return false;
+    }
+
+    @Override
+    public boolean updateMenuItem(MenuItem menuItem) {
+        return false;
+    }
+
+    @Override
+    public List<MenuItem> getMenu() {
+        return List.of();
+    }
+
+    @Override
     public boolean areItemsAvailable(List<MenuItem> items) {
         return false;
     }

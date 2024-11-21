@@ -13,6 +13,7 @@ public class MobileOrder implements OrderController {
     OrderUseCase orderUseCase;
     OrderMapper mapper;
 
+    @Override
     public ResponseEntity<Order> placeOrder(OrderRequest orderRequest) {
         Order newOrder = mapper.map(orderRequest);
         Order order = orderUseCase.placeOrder(newOrder);
@@ -20,6 +21,7 @@ public class MobileOrder implements OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 
+    @Override
     public ResponseEntity<Void> updateOrderStatus(Long orderId, OrderStatus status) {
         orderUseCase.updateOrderStatus(orderId, status);
         return ResponseEntity.ok().build();
