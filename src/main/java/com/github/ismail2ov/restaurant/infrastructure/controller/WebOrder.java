@@ -1,36 +1,37 @@
 package com.github.ismail2ov.restaurant.infrastructure.controller;
 
-import com.github.ismail2ov.restaurant.application.OrderUseCase;
 import com.github.ismail2ov.restaurant.application.PaymentUseCase;
+import com.github.ismail2ov.restaurant.application.PlaceOrderUseCase;
+import com.github.ismail2ov.restaurant.application.UpdateOrderStatusUseCase;
 import com.github.ismail2ov.restaurant.domain.Order;
 import com.github.ismail2ov.restaurant.domain.OrderStatus;
-import com.github.ismail2ov.restaurant.domain.PaymentService;
-import com.github.ismail2ov.restaurant.infrastructure.OrderRequest;
 import com.github.ismail2ov.restaurant.domain.PaymentDetails;
+import com.github.ismail2ov.restaurant.infrastructure.OrderRequest;
 import com.github.ismail2ov.restaurant.infrastructure.mapper.OrderMapper;
-import com.github.ismail2ov.restaurant.infrastructure.payment.CashPayment;
-import com.github.ismail2ov.restaurant.infrastructure.payment.PosPayment;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-public class WebOrder implements OrderController {
+@Controller
+@RequiredArgsConstructor
+public class WebOrder implements OrderController, PaymentController {
 
-    OrderUseCase orderUseCase;
-    PaymentUseCase paymentUseCase;
-    PosPayment posPayment;
-    CashPayment cashPayment;
-    OrderMapper mapper;
+    private final PlaceOrderUseCase placeOrderUseCase;
+    private final UpdateOrderStatusUseCase updateOrderStatusUseCase;
+    private final PaymentUseCase paymentUseCase;
+    private final OrderMapper mapper;
 
     @Override
     @PostMapping("/orders")
     public ResponseEntity<Order> placeOrder(@RequestBody OrderRequest orderRequest) {
         Order newOrder = mapper.map(orderRequest);
-        Order order = orderUseCase.placeOrder(newOrder);
+        Order order = placeOrderUseCase.apply(newOrder);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
@@ -38,14 +39,17 @@ public class WebOrder implements OrderController {
     @Override
     @PutMapping("/orders/{orderId}/status")
     public ResponseEntity<Void> updateOrderStatus(@PathVariable Long orderId, @RequestParam OrderStatus status) {
-        orderUseCase.updateOrderStatus(orderId, status);
-        return ResponseEntity.ok().build();
+        Order order = updateOrderStatusUseCase.apply(orderId, status);
+
+        return generateResponse(order.getStatus().equals(status));
     }
 
+    @Override
     @PostMapping("/payments/{orderId}")
     public ResponseEntity<Void> processPayment(@PathVariable Long orderId, @RequestBody PaymentDetails paymentDetails) {
-        PaymentService paymentService = (paymentDetails.isPosPayment()) ? posPayment : cashPayment;
-        paymentUseCase.processPayment(paymentService, orderId, paymentDetails);
-        return ResponseEntity.ok().build();
+        boolean isSuccess = paymentUseCase.apply(orderId, paymentDetails);
+
+        return generateResponse((isSuccess));
     }
+
 }

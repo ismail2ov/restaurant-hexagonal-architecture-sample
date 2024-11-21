@@ -6,16 +6,18 @@ import com.github.ismail2ov.restaurant.domain.Order;
 import com.github.ismail2ov.restaurant.domain.OrderService;
 import com.github.ismail2ov.restaurant.domain.OrderStatus;
 import com.github.ismail2ov.restaurant.domain.exception.ItemsNotAvailableException;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class OrderUseCase {
+public class PlaceOrderUseCase implements Function<Order, Order> {
 
     private final OrderService orderService;
     private final MenuService menuService;
     private final KitchenService kitchenService;
 
-    public Order placeOrder(Order orderRequest) {
+    @Override
+    public Order apply(Order orderRequest) {
         boolean allItemsAvailable = menuService.areItemsAvailable(orderRequest.getItems());
         if (!allItemsAvailable) {
             throw new ItemsNotAvailableException("One or more items are not available");
@@ -27,14 +29,5 @@ public class OrderUseCase {
         kitchenService.sendOrderToKitchen(savedOrder);
 
         return savedOrder;
-    }
-
-    public Order getOrderById(Long id) {
-        return orderService.findOrderById(id);
-    }
-
-
-    public void updateOrderStatus(Long orderId, OrderStatus status) {
-        orderService.updateOrderStatus(orderId, status);
     }
 }

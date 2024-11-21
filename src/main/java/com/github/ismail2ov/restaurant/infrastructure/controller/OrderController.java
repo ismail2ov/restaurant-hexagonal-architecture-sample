@@ -10,4 +10,8 @@ public interface OrderController {
     ResponseEntity<Order> placeOrder(OrderRequest orderRequest);
 
     ResponseEntity<Void> updateOrderStatus(Long orderId, OrderStatus status);
+
+    default ResponseEntity<Void> generateResponse(boolean isSuccess) {
+        return isSuccess ? ResponseEntity.ok().build() : ResponseEntity.internalServerError().build();
+    }
 }
